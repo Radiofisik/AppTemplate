@@ -1,6 +1,6 @@
 ---
 title: Proxy, Nginx, OpenResty
-description:
+description: Настройка аутентификации через Google
 ---
 
 Микросервисная архитектура предполагает наличие некоторого проксирующего узла, который контролирует может контролировать доступ к внутренним API, проверять аутентификацию пользователей... Так в проекте  в демонстрационном проекте Microsoft  https://github.com/dotnet-architecture/eShopOnContainers этот слой реализован с помощью Ocelot. Однако в индустрии наиболее типичной практикой является использование Nginx в качестве прокси сервера. Для расширения возможностей Nginx в него можно встроить язык программирования Lua (проект Open Resty).
@@ -91,3 +91,70 @@ COPY ./conf/*.conf /etc/nginx/conf.d/
 ```
 
 После чего можно зайти по ссылке http://docker/ (docker это адрес хоста с докером - в моем случае 192.168.99.100) и увидеть `hello world ` в браузере
+
+## Google аутентификация
+
+В проекте https://github.com/zmartzone/lua-resty-openidc есть пример который можно использовать для внедрения google аутентификации в проект. Добавим в `Dockerfile`
+
+```dockerfile
+RUN luarocks install lua-resty-openidc
+```
+
+Получим в консоле девелопера https://console.developers.google.com/ параметры аутентификации приложения `client_id` и `client_secret`. Там же надо настроить разрешения для урлов редиректа. Для целей тестирования пропишем в hosts файл `192.168.99.100 test.com` Для теста создадим небольшое приложение (код, docker-compose см. репозиторий) которое возвращает заголовки запроса сделанного к нему, запустим его в докере по адресу app.  Добавим в папку с файлами конфигурации файл `google.conf`
+
+```nginx
+  lua_package_path '~/lua/?.lua;;';
+
+  resolver 8.8.8.8;
+
+  lua_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+  lua_ssl_verify_depth 5;
+
+  # cache for discovery metadata documents
+  lua_shared_dict discovery 1m;
+  # cache for JWKs
+  lua_shared_dict jwks 1m;
+
+  server {
+    listen 80;
+
+    location / {
+
+      access_by_lua_block {
+	  
+          local opts = {
+             redirect_uri = "http://test.com/secured",
+             discovery = "https://accounts.google.com/.well-known/openid-configuration",
+             client_id = "id from google",
+             client_secret = "secret from google"
+          }
+
+          -- call authenticate for OpenID Connect user authentication
+          local res, err = require("resty.openidc").authenticate(opts)
+
+          if err then
+            ngx.status = 500
+            ngx.say(err)
+            ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+          end
+
+			ngx.req.set_header("X-EMAIL", res.user.email)
+			ngx.req.set_header("X-USER", res.id_token.sub)
+      }
+
+      proxy_pass http://app;
+    }
+}
+```
+
+Соберем и запустим все в докере 
+
+```bash
+docker-compose build && docker-compose up -d
+```
+
+Перейдя в по ссылке http://test.com/ Увидим что после аутентификации на сайте Google в заголовок запроса попадают заданные в конфиге `X-EMAIL` которые можно использовать в коде программы.
+
+
+
+> Репозиторий проекта https://github.com/Radiofisik/AuthProxy

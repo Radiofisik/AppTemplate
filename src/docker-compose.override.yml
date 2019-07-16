@@ -5,3 +5,7 @@ services:
     build:
         context: ./Proxy
         dockerfile: Dockerfile
+  app:
+    build:
+        context: ./App
+        dockerfile: ./App/Dockerfile
