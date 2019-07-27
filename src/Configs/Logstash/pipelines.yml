@@ -1,0 +1,9 @@
+- pipeline.id: HABR
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: "./config/pipeline/habr_pipeline.conf"
+
+- pipeline.id: SYSLOG
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: "./config/pipeline/syslog_pipeline.conf"

@@ -8,4 +8,4 @@ services:
   app:
     build:
         context: ./App
-        dockerfile: ./App/Dockerfile
+        dockerfile: /App/App/Dockerfile
