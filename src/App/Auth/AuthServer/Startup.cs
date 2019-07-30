@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using App.Config;
+using AuthServer.MiddleWare;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Infrastructure.Api.Helpers.Implementations;
@@ -40,7 +41,8 @@ namespace AuthServer
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApis())
                 .AddInMemoryClients(Config.GetClients())
-                .AddTestUsers(Config.GetUsers());
+                .AddTestUsers(Config.GetUsers())
+                .AddDeveloperSigningCredential();
 
 
             var builder = new ContainerBuilder();
@@ -62,6 +64,7 @@ namespace AuthServer
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<BaseUrlMiddleWare>();
             app.UseMiddleware<SessionMiddleWare>();
             app.UseMiddleware<LoggingMiddleWare>();
 

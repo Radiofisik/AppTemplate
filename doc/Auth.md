@@ -31,7 +31,8 @@ services.AddIdentityServer()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApis())
                 .AddInMemoryClients(Config.GetClients())
-                .AddTestUsers(Config.GetUsers());
+                .AddTestUsers(Config.GetUsers())
+                .AddDeveloperSigningCredential();
 
 
 app.UseIdentityServer();
@@ -95,7 +96,7 @@ app.UseIdentityServer();
                     },
 
                     // scopes that client has access to
-                    AllowedScopes = { "api1" }
+                    AllowedScopes = {  IdentityServerConstants.StandardScopes.OpenId, "api1" }
                 },
                 // resource owner password grant client
                 new Client
@@ -123,7 +124,54 @@ location ~ ^/auth/ {
 }
 ```
 
-таким образом сервер будет доступен по адресу http://docker/auth/.well-known/openid-configuration но в ответ он выдает адреса как будто он доступен напрямую.
+таким образом сервер будет доступен по адресу http://docker/auth/.well-known/openid-configuration но в ответ он выдает адреса как будто он доступен напрямую. Для того чтобы с этим что-то сделать надо знать на какой url шел запрос на первую прокси от польлзователя. Добавим в прокси конфиг который кладет этот адрес в заголовок.
+
+```nginx
+ 	set $url $http_X_real_base_url;
+
+    if ($http_X_real_base_url = "") {
+        set $url $scheme://$http_host/auth;
+    }
+
+    proxy_set_header X-real-base-url $url;
+```
+
+Чтобы IdentityServer понимал этот url добавим MiddleWare
+
+```c#
+ public class BaseUrlMiddleWare
+    {
+        private readonly RequestDelegate _next;
+
+        public BaseUrlMiddleWare(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            var realBaseUrl = context.Request.Headers["X-real-base-url"];
+            var url = realBaseUrl.FirstOrDefault() ?? $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}";
+
+            Uri uriAddress = new Uri(url, UriKind.Absolute);
+
+            context.Request.Scheme = uriAddress.Scheme;
+            context.Request.PathBase = new PathString(uriAddress.LocalPath);
+            context.Request.Host = new HostString(uriAddress.Host, uriAddress.Port);
+            context.SetIdentityServerBasePath(uriAddress.LocalPath);
+
+            await _next(context);
+        }
+    }
+```
+
+теперь запрос discovery http://docker/auth/.well-known/openid-configuration выдает приличны результат
+
+```json
+{"issuer":"http://docker:80/auth","authorization_endpoint":"http://docker:80/auth/connect/authorize","token_endpoint":"http://docker:80/auth/connect/token","userinfo_endpoint":"http://docker:80/auth/connect/userinfo","end_session_endpoint":"http://docker:80/auth/connect/endsession","check_session_iframe":"http://docker:80/auth/connect/checksession","revocation_endpoint":"http://docker:80/auth/connect/revocation","introspection_endpoint":"http://docker:80/auth/connect/introspect","device_authorization_endpoint":"http://docker:80/auth/connect/deviceauthorization","frontchannel_logout_supported":true,"frontchannel_logout_session_supported":true,"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"scopes_supported":["openid","api1","offline_access"],"claims_supported":["sub"],"grant_types_supported":["authorization_code","client_credentials","refresh_token","implicit","password","urn:ietf:params:oauth:grant-type:device_code"],"response_types_supported":["code","token","id_token","id_token token","code id_token","code token","code id_token token"],"response_modes_supported":["form_post","query","fragment"],"token_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post"],"subject_types_supported":["public"],"id_token_signing_alg_values_supported":["RS256"],"code_challenge_methods_supported":["plain","S256"],"request_parameter_supported":true}
+```
+
+
 
 ## Claim Based аутентификация
 
