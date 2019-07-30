@@ -10,6 +10,21 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <PackageReference Include="Rebus" Version="5.3.1" />
+    <PackageReference Include="Rebus.Autofac" Version="5.2.0" />
+    <PackageReference Include="Rebus.RabbitMq" Version="5.1.2" />
+    <PackageReference Include="Rebus.Serilog" Version="5.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="7.1.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="Serilog.Sinks.Elasticsearch">
+      <HintPath>C:\Users\radiofisik\.nuget\packages\serilog.sinks.elasticsearch\7.1.0\lib\netstandard1.3\Serilog.Sinks.Elasticsearch.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

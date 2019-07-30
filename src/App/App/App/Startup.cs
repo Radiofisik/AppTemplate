@@ -5,6 +5,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Handlers;
 using Infrastructure.Api.Helpers.Implementations;
+using Infrastructure.Extensions;
 using Infrastructure.Logger;
 using Infrastructure.MiddleWare;
 using Infrastructure.Session.Implementation;
@@ -51,12 +52,16 @@ namespace App
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
+
             builder.RegisterType<SessionStorage>().InstancePerLifetimeScope().AsImplementedInterfaces();
             builder.RegisterType<HttpClientHelper>().AsImplementedInterfaces();
-
             builder.RegisterSource(new CustomLoggerRegistrator());
+
             builder.RegisterModule<ServiceRegistrationModule>();
             builder.RegisterModule<HandlerRegistrationModule>();
+
+            builder.AddEventBus();
+
             builder.RegisterType<OnStart>().AsImplementedInterfaces();
             _container = builder.Build();
             return new AutofacServiceProvider(this._container);
