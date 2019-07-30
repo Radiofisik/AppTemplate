@@ -36,6 +36,13 @@ namespace AuthServer
             services.AddSingleton(resolver =>
                 resolver.GetRequiredService<IOptions<Connections>>().Value);
 
+            services.AddIdentityServer()
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApis())
+                .AddInMemoryClients(Config.GetClients())
+                .AddTestUsers(Config.GetUsers());
+
+
             var builder = new ContainerBuilder();
             builder.Populate(services);
 
@@ -57,6 +64,8 @@ namespace AuthServer
 
             app.UseMiddleware<SessionMiddleWare>();
             app.UseMiddleware<LoggingMiddleWare>();
+
+            app.UseIdentityServer();
 
             app.Run(async (context) =>
             {
