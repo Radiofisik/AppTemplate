@@ -8,7 +8,7 @@ using Autofac.Core.Lifetime;
 using Autofac.Core.Registration;
 using Microsoft.Extensions.Logging;
 
-namespace App
+namespace Infrastructure.Logger
 {
     public class CustomLoggerRegistrator : IRegistrationSource
     {

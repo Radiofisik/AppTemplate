@@ -5,6 +5,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Handlers;
 using Infrastructure.Api.Helpers.Implementations;
+using Infrastructure.Logger;
 using Infrastructure.MiddleWare;
 using Infrastructure.Session.Implementation;
 using Microsoft.AspNetCore.Builder;
