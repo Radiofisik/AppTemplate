@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.Session.Abstraction;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -39,22 +41,45 @@ namespace Infrastructure.MiddleWare
                 //Continue down the Middleware pipeline, eventually returning to this class
                 using (logger.BeginScope(sessionStorage.GetLoggingHeaders()))
                 {
-                    using (logger.BeginScope(new Dictionary<string, object> { { "Headers", headers }, { "Body", body } }))
+                    using (logger.BeginScope(new Dictionary<string, object> {{"Headers", headers}, {"Body", body}}))
                     {
-                        logger.LogInformation($"HTTP request: {context.Request.Scheme} {context.Request.Host}" + "{RequestPath} {QueryString}", context.Request.Path, context.Request.QueryString);
+                        logger.LogInformation("HTTP {Method} request: {Scheme} {Host} {RequestPath} {QueryString}", context.Request.Method, context.Request.Scheme, context.Request.Host, context.Request.Path, context.Request.QueryString);
                     }
 
-                    await _next(context);
+                    try
+                    {
+                        await _next(context);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogCritical(ex, "Exception while executing {Method} method for {RequestPath}",
+                           context.Request.Method, context.Request.Path);
+                        await HandleExceptionAsync(context, ex);
+                    }
 
                     //Format the response from the server
                     var response = await GetResponseBodyString(context.Response);
 
-                    logger.LogDebug("HTTP response status: {status} {body}", context.Response.StatusCode, response);
+                    logger.LogInformation("HTTP response status: {StatusCode} while executing {Method} method for {RequestPath}",
+                        context.Response.StatusCode, context.Request.Method, context.Request.Path);
+
+                    logger.LogDebug("HTTP response status: {StatusCode} {body}", context.Response.StatusCode, response);
                 }
 
                 //Copy the contents of the new memory stream (which contains the response) to the original stream, which is then returned to the client.
                 await responseBody.CopyToAsync(originalBodyStream);
             }
+        }
+
+        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+
+            return context.Response.WriteAsync(new ObjectResult("Internal Error")
+            {
+                StatusCode = context.Response.StatusCode,
+            }.ToString());
         }
 
         private async Task<string> GetRequestBodyString(HttpRequest request)
