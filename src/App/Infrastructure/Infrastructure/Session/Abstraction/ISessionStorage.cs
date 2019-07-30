@@ -11,5 +11,6 @@ namespace Infrastructure.Session.Abstraction
 
         //used as context to call api or enquue messages
         Dictionary<string, string> GetTraceHeaders();
+        Dictionary<string, string> GetExternalTraceHeaders();
     }
 }

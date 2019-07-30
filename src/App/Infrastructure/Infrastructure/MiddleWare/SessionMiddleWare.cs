@@ -29,6 +29,15 @@ namespace Infrastructure.MiddleWare
             var headers = context.Request.Headers.Select(x => (x.Key, x.Value.AsEnumerable())).ToArray();
             sessionStorage.SetHeaders(headers);
 
+            context.Response.OnStarting(() =>
+            {
+                foreach (var header in sessionStorage.GetExternalTraceHeaders())
+                {
+                    context.Response.Headers.Append(header.Key, header.Value);
+                }
+                return Task.CompletedTask;
+            });
+
             await _next(context);
         }
     }
