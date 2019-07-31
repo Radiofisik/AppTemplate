@@ -151,14 +151,17 @@ location ~ ^/auth/ {
         public async Task Invoke(HttpContext context)
         {
             var realBaseUrl = context.Request.Headers["X-real-base-url"];
-            var url = realBaseUrl.FirstOrDefault() ?? $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}";
+            var url = realBaseUrl.FirstOrDefault();
 
-            Uri uriAddress = new Uri(url, UriKind.Absolute);
+            if (url != null)
+            {
+                Uri uriAddress = new Uri(url, UriKind.Absolute);
 
-            context.Request.Scheme = uriAddress.Scheme;
-            context.Request.PathBase = new PathString(uriAddress.LocalPath);
-            context.Request.Host = new HostString(uriAddress.Host, uriAddress.Port);
-            context.SetIdentityServerBasePath(uriAddress.LocalPath);
+                context.Request.Scheme = uriAddress.Scheme;
+                context.Request.PathBase = new PathString(uriAddress.LocalPath);
+                context.Request.Host = new HostString(uriAddress.Host, uriAddress.Port);
+                context.SetIdentityServerBasePath(uriAddress.LocalPath);
+            }
 
             await _next(context);
         }
@@ -182,6 +185,29 @@ location ~ ^/api/(?<service>[\.a-zA-Z0-9_-]+)/(.*)$ {
     proxy_pass $upstream_endpoint;
 }
 
+```
+
+для отладки переопределим конфиг менее общим, который редиректит на приложение запущенное в Visual Studio и проверим аутентификацию
+
+```lua
+location ~ ^/api/app/(.*)$ {
+	rewrite ^/api/app/(.*) /$1 break;
+	proxy_pass http://debughost:5000;
+	 access_by_lua '
+	 local opts = {
+		 discovery = "http://192.168.1.103:5005/.well-known/openid-configuration"
+	 }
+
+	  	-- call bearer_jwt_verify for OAuth 2.0 JWT validation
+          local res, err = require("resty.openidc").bearer_jwt_verify(opts)
+
+           if err or not res then
+            ngx.status = 403
+            ngx.say(err and err or "no access_token provided")
+            ngx.exit(ngx.HTTP_FORBIDDEN)
+          end
+	 ';
+}
 ```
 
 

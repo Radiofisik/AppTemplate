@@ -22,3 +22,11 @@ jwtContent = jwt.decode(token, 'secret',  verify=False)
 print(jwtContent)
 
 print(json.dumps(jwtContent, indent=4, sort_keys=True))
+
+headers = {'Authorization': 'Bearer '+token,
+             'Content-Type':'application/json',
+             'Accept': 'text/plain',
+             'Content-Encoding': 'utf-8'}
+
+response = requests.get("http://docker/api/app/api/internal/do-something", headers=headers)
+print(response.content)

@@ -19,14 +19,17 @@ namespace AuthServer.MiddleWare
         public async Task Invoke(HttpContext context)
         {
             var realBaseUrl = context.Request.Headers["X-real-base-url"];
-            var url = realBaseUrl.FirstOrDefault() ?? $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}";
+            var url = realBaseUrl.FirstOrDefault();
 
-            Uri uriAddress = new Uri(url, UriKind.Absolute);
+            if (url != null)
+            {
+                Uri uriAddress = new Uri(url, UriKind.Absolute);
 
-            context.Request.Scheme = uriAddress.Scheme;
-            context.Request.PathBase = new PathString(uriAddress.LocalPath);
-            context.Request.Host = new HostString(uriAddress.Host, uriAddress.Port);
-            context.SetIdentityServerBasePath(uriAddress.LocalPath);
+                context.Request.Scheme = uriAddress.Scheme;
+                context.Request.PathBase = new PathString(uriAddress.LocalPath);
+                context.Request.Host = new HostString(uriAddress.Host, uriAddress.Port);
+                context.SetIdentityServerBasePath(uriAddress.LocalPath);
+            }
 
             await _next(context);
         }
