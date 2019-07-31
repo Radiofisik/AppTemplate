@@ -82,13 +82,19 @@ namespace App
 //                    .AllowCredentials()
             );
 
-            app.UseSwagger();
+            var baseUrl = "/api/app";
 
+            app.UseSwagger(c=>c.PreSerializeFilters.Add((doc, req) =>
+            {
+                doc.BasePath = baseUrl;
+            }));
+
+         
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint($"{baseUrl}/swagger/v1/swagger.json", "My API V1");
             });
 
             app.UseMiddleware<SessionMiddleWare>();

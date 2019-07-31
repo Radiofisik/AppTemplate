@@ -171,6 +171,19 @@ location ~ ^/auth/ {
 {"issuer":"http://docker:80/auth","authorization_endpoint":"http://docker:80/auth/connect/authorize","token_endpoint":"http://docker:80/auth/connect/token","userinfo_endpoint":"http://docker:80/auth/connect/userinfo","end_session_endpoint":"http://docker:80/auth/connect/endsession","check_session_iframe":"http://docker:80/auth/connect/checksession","revocation_endpoint":"http://docker:80/auth/connect/revocation","introspection_endpoint":"http://docker:80/auth/connect/introspect","device_authorization_endpoint":"http://docker:80/auth/connect/deviceauthorization","frontchannel_logout_supported":true,"frontchannel_logout_session_supported":true,"backchannel_logout_supported":true,"backchannel_logout_session_supported":true,"scopes_supported":["openid","api1","offline_access"],"claims_supported":["sub"],"grant_types_supported":["authorization_code","client_credentials","refresh_token","implicit","password","urn:ietf:params:oauth:grant-type:device_code"],"response_types_supported":["code","token","id_token","id_token token","code id_token","code token","code id_token token"],"response_modes_supported":["form_post","query","fragment"],"token_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post"],"subject_types_supported":["public"],"id_token_signing_alg_values_supported":["RS256"],"code_challenge_methods_supported":["plain","S256"],"request_parameter_supported":true}
 ```
 
+## Проверка токена
+
+Приложение сейчас доступно напрямую по ссылке http://docker:8081/swagger/index.html и внутри докера по http://app/swagger/index.html Вынесем его за прокси чтобы адрес был  http://docker/api/app/swagger/index.html и внутри докера по http://app/swagger/index.html 
+
+```nginx
+location ~ ^/api/(?<service>[\.a-zA-Z0-9_-]+)/(.*)$ {
+    set $upstream_endpoint http://${service}:80;
+    rewrite ^/api/([\.a-zA-Z0-9_-]+)/(.*) /$2 break;
+    proxy_pass $upstream_endpoint;
+}
+
+```
+
 
 
 ## Claim Based аутентификация

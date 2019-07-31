@@ -47,7 +47,6 @@ services:
     depends_on:
       - elastic
 
-
   rabbit:
     image: rabbitmq:3-management
     restart: always
@@ -57,7 +56,6 @@ services:
     volumes:
       - ./Configs/Rabbit/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
 
-  
   postgres:
     image: postgres:11.2-alpine
     restart: always
