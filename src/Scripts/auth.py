@@ -7,8 +7,8 @@ payload = {
     'client_id': 'client',
     'grant_type': 'password',
     'client_secret': 'secret',
-    'scope': 'openid',
-    'username': 'alice',
+    'scope': 'openid email',
+    'username': 'bob',
     'password': 'password'
      }
 
@@ -30,3 +30,12 @@ headers = {'Authorization': 'Bearer '+token,
 
 response = requests.get("http://docker/api/app/api/internal/do-something", headers=headers)
 print(response.content)
+
+
+# headers = {'X-USER-ISADMIN': 'true',
+#              'Content-Type':'application/json',
+#              'Accept': 'text/plain',
+#              'Content-Encoding': 'utf-8'}
+
+# response = requests.get("http://docker/api/app/api/internal/do-something", headers=headers)
+# print(response.content)
