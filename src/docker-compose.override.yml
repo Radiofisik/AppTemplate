@@ -9,3 +9,8 @@ services:
     build:
         context: ./App
         dockerfile: /App/App/Dockerfile
+
+  auth:
+    build:
+        context: ./App
+        dockerfile: /Auth/AuthServer/Dockerfile

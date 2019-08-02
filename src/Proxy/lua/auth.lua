@@ -1,7 +1,7 @@
 local module = {};
 
 module.opts = {
-    discovery = "http://192.168.1.103:5005/.well-known/openid-configuration"
+    discovery = "http://auth/.well-known/openid-configuration"
 }
 
 function module.authorize(ngx)

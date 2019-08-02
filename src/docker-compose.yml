@@ -80,6 +80,15 @@ services:
       Connections:ElasticSearchConnectionString: http://elastic:9200
       Connections:RabbitConnectionString: amqp://rabbit
 
+  auth:
+      image: radiofisik/auth
+      restart: always
+      ports:
+        - 8082:80
+      environment:
+        Connections:ElasticSearchConnectionString: http://elastic:9200
+        Connections:RabbitConnectionString: amqp://rabbit
+
 volumes:
   elastic_data_l: {}
   elastic_log_l: {}
