@@ -6,6 +6,7 @@ using App.Config;
 using AuthServer.DAL;
 using AuthServer.MiddleWare;
 using AuthServer.Models;
+using AuthServer.Services;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Infrastructure.Api.Helpers.Implementations;
@@ -68,6 +69,8 @@ namespace AuthServer
             builder.RegisterSource(new CustomLoggerRegistrator());
 
             builder.RegisterType<AppContextMigrator>().As<IStartable>();
+
+            builder.RegisterType<CustomProfileService>().AsImplementedInterfaces();
 
             builder.AddEventBus();
 
