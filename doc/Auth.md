@@ -529,5 +529,4 @@ response = requests.post("http://api-url", data=json.dumps(payload), headers=hea
 print(response.content)
 ```
 
-
-
+>  Репозиторий https://github.com/Radiofisik/AppTemplate tag `identity`
