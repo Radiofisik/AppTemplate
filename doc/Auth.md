@@ -312,7 +312,49 @@ Swagger поддерживает аутентификацию, для того �
             });
 ```
 
+## ASP Net Identity
 
+IdentityServer 4 не имеет встроенного функционала по поддержанию базы данных пользователей. Для этого используется AspNet Identity. Создадим классы пользователя, роли, контекста
+
+```c#
+public class ApplicationUser: IdentityUser<Guid>
+    {
+    }
+    
+  public class ApplicationRole: IdentityRole<Guid>
+    {
+    }
+    
+public class ApplicationDbContext: IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
+    {
+        private readonly Connections _connections;
+
+        public ApplicationDbContext(Connections connections)
+        {
+            _connections = connections;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseNpgsql(_connections.DBConnectionString, options=>options.MigrationsHistoryTable("__EFMigrationsHistory", "auth"));
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.HasDefaultSchema("auth");
+            base.OnModelCreating(builder);
+        }
+    }
+```
+
+Зарегстрируем Identity и контекст БД
+
+```c#
+  services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+  services.AddDbContext<ApplicationDbContext>();
+```
+
+Добавим миграции и смигрируем БД.
 
 ## Claim Based аутентификация
 

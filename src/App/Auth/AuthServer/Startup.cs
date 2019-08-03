@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using App.Config;
+using AuthServer.DAL;
 using AuthServer.MiddleWare;
+using AuthServer.Models;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Infrastructure.Api.Helpers.Implementations;
@@ -14,6 +16,7 @@ using Infrastructure.Session.Implementation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -37,6 +40,11 @@ namespace AuthServer
             services.AddSingleton(resolver =>
                 resolver.GetRequiredService<IOptions<Connections>>().Value);
 
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+            services.AddDbContext<ApplicationDbContext>();
+
             services.AddIdentityServer()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApis())
@@ -50,6 +58,8 @@ namespace AuthServer
 
             builder.RegisterType<SessionStorage>().InstancePerLifetimeScope().AsImplementedInterfaces();
             builder.RegisterSource(new CustomLoggerRegistrator());
+
+            builder.RegisterType<AppContextMigrator>().As<IStartable>();
 
             builder.AddEventBus();
 

@@ -88,7 +88,7 @@ services:
       environment:
         Connections:ElasticSearchConnectionString: http://elastic:9200
         Connections:RabbitConnectionString: amqp://rabbit
-
+        Connections:RDBConnectionString: "Host=postgres;Database=appbd;Username=user;Password=password"
 volumes:
   elastic_data_l: {}
   elastic_log_l: {}
