@@ -50,8 +50,16 @@ namespace AuthServer
                 .AddInMemoryApiResources(Config.GetApis())
                 .AddInMemoryClients(Config.GetClients())
                 .AddTestUsers(Config.GetUsers())
+                .AddAspNetIdentity<ApplicationUser>()
                 .AddDeveloperSigningCredential();
 
+            services.AddMvcCore()
+                .AddJsonFormatters()
+                .AddJsonOptions(options => options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc)
+                .AddApiExplorer() // to Swagger UI
+                .AddCors();
+
+            services.AddCustomSwagger();
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
@@ -74,16 +82,21 @@ namespace AuthServer
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(
+                builder => builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+            );
+
+//            app.UseCustomSwagger("");
+            app.UseCustomSwagger("/api/auth");
+
             app.UseMiddleware<BaseUrlMiddleWare>();
             app.UseMiddleware<SessionMiddleWare>();
             app.UseMiddleware<LoggingMiddleWare>();
 
             app.UseIdentityServer();
-
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
+            app.UseMvc();
         }
     }
 }

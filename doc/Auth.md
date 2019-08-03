@@ -354,7 +354,42 @@ public class ApplicationDbContext: IdentityDbContext<ApplicationUser, Applicatio
   services.AddDbContext<ApplicationDbContext>();
 ```
 
-Добавим миграции и смигрируем БД.
+Добавим миграции и смигрируем БД. Теперь сделаем простейший контроллер для регистрации пользователя
+
+```c#
+[Route("account")]
+    public class AccountController: BaseController
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AccountController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+            [HttpGet("do-something")]
+            public async Task<IActionResult> DoSomething(string email, string password)
+            {
+                var user = new ApplicationUser()
+                {
+                    Email = email,
+                    UserName = email
+                };
+
+                var result = await _userManager.CreateAsync(user, password);
+
+                return Result(new Success<bool>(result.Succeeded));
+            }
+    }
+```
+
+Осталось подключить IdentityServer4 к Identity. Для этого надо установить пакет `IdentityServer4.AspNetIdentity` и добавить
+
+```c#
+  .AddAspNetIdentity<ApplicationUser>()
+```
+
+
 
 ## Claim Based аутентификация
 
