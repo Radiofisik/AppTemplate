@@ -1,0 +1,6 @@
+version: '3'
+
+services:
+  front:
+    image: radiofisik/front
+    restart: always

@@ -14,3 +14,8 @@ services:
     build:
         context: ./App
         dockerfile: /Auth/AuthServer/Dockerfile
+
+  front:
+      build:
+        context: './Front'
+        dockerfile: 'Dockerfile'
