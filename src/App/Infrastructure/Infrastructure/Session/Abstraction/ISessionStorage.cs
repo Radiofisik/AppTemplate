@@ -5,6 +5,7 @@ namespace Infrastructure.Session.Abstraction
     public interface ISessionStorage
     {
         void SetHeaders(params (string Key, IEnumerable<string> Value)[] headers);
+        void SetHeaders(Dictionary<string, string> headers);
 
         //adds to every log message
         Dictionary<string, object> GetLoggingHeaders();

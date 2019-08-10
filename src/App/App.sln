@@ -36,13 +36,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServer", "Auth\AuthServ
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scheduler", "Scheduler", "{823FBCA7-FCAE-47E0-BEDF-467B1383E4D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler.App", "Scheduler\Scheduler.App\Scheduler.App.csproj", "{24473F63-FA2C-4D4B-BFDA-06BE004FDD41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler.App", "Scheduler\Scheduler.App\Scheduler.App.csproj", "{24473F63-FA2C-4D4B-BFDA-06BE004FDD41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler.Commands", "Scheduler\Scheduler.Commands\Scheduler.Commands.csproj", "{FF4EBDED-E240-47BD-B3B4-1822D99C5EA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler.Commands", "Scheduler\Scheduler.Commands\Scheduler.Commands.csproj", "{FF4EBDED-E240-47BD-B3B4-1822D99C5EA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler.Handlers", "Scheduler\Scheduler.Handlers\Scheduler.Handlers.csproj", "{D6FC5D31-E1D7-4691-B85B-A9740FA28E04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler.Handlers", "Scheduler\Scheduler.Handlers\Scheduler.Handlers.csproj", "{D6FC5D31-E1D7-4691-B85B-A9740FA28E04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler.Services", "Scheduler\Scheduler.Services\Scheduler.Services.csproj", "{F002FAF8-675C-4693-9E2D-68299392E195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scheduler.Services", "Scheduler\Scheduler.Services\Scheduler.Services.csproj", "{F002FAF8-675C-4693-9E2D-68299392E195}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -22,6 +22,14 @@ namespace Infrastructure.Session.Implementation
             }
         }
 
+        public void SetHeaders(Dictionary<string, string> headers)
+        {
+            foreach (var (Key, Value) in headers)
+            {
+                _headers[Key.ToLower()] = Value;
+            }
+        }
+
         public Dictionary<string, object> GetLoggingHeaders()
         {
             return new Dictionary<string, object>

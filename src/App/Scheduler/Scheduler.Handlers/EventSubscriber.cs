@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Autofac;
 using Rebus.Bus;
+using Scheduler.Commands;
 
 namespace Scheduler.Handlers
 {
@@ -17,7 +18,7 @@ namespace Scheduler.Handlers
 
         public void Start()
         {
-//            _bus.Subscribe<TestEvent>().Wait();
+            _bus.Subscribe<CreateTaskCommand>().Wait();
         }
     }
 }

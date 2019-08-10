@@ -89,6 +89,17 @@ services:
         Connections:ElasticSearchConnectionString: http://elastic:9200
         Connections:RabbitConnectionString: amqp://rabbit
         Connections:DBConnectionString: "Host=postgres;Database=appbd;Username=user;Password=password"
+
+  scheduler:
+      image: radiofisik/scheduler
+      restart: always
+      ports:
+        - 8084:80
+      environment:
+        Connections:ElasticSearchConnectionString: http://elastic:9200
+        Connections:RabbitConnectionString: amqp://rabbit
+        Connections:DBConnectionString: "Host=postgres;Database=appbd;Username=user;Password=password"
+
   front:
     image: radiofisik/front
     restart: always

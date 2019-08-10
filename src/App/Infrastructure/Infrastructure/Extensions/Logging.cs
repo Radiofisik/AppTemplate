@@ -16,13 +16,14 @@ namespace Infrastructure.Extensions
                 .MinimumLevel.Information()
                 .ReadFrom.Configuration(hostingContext.Configuration)
                 .Enrich.FromLogContext()
+                .Enrich.WithAssemblyName()
                 .WriteTo.Console()
                 .WriteTo.Console(new CompactJsonFormatter())
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(hostingContext.Configuration["Connections:ElasticSearchConnectionString"]))
                 {
                     AutoRegisterTemplate = true,
                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
-                    TemplateName = "serilog",
+                    TemplateName = "serilog2",
                     IndexFormat = "serilog-{0:yyyy.MM.dd}"
                 })
             );

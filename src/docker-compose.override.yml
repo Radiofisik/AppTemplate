@@ -15,6 +15,11 @@ services:
         context: ./App
         dockerfile: /Auth/AuthServer/Dockerfile
 
+  scheduler:
+    build:
+        context: ./App
+        dockerfile: /Scheduler/Scheduler.App/Dockerfile
+
   front:
       build:
         context: './Front'

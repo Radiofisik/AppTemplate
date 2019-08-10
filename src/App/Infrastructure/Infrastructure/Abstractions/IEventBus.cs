@@ -8,5 +8,6 @@ namespace Infrastructure.Abstractions
     public interface IEventBus
     {
         Task Publish<TEvent>(TEvent @event);
+        Task Publish(object command, string routingKey);
     }
 }

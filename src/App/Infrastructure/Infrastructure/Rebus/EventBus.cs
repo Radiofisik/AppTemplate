@@ -23,5 +23,28 @@ namespace Infrastructure.Rebus
         {
             return _bus.Publish(@event, _sessionStorage.GetTraceHeaders());
         }
+
+        public Task Publish(object command, string type)
+        {
+            var headers = new Dictionary<string, string>
+            {
+                ["rbs2-content-type"] = "application/json;charset=utf-8",
+                ["rbs2-msg-type"] = type,
+                ["content_type"] = "application/json;charset=utf-8"
+            };
+
+            var traceHeaders = _sessionStorage.GetTraceHeaders();
+
+            foreach (var header in traceHeaders)
+            {
+                headers[header.Key] = header.Value;
+            }
+
+            return _bus.Advanced.Topics.Publish(
+                type,
+                command,
+                headers
+            );
+        }
     }
 }
