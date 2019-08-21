@@ -38,10 +38,22 @@ namespace Infrastructure.MiddleWare
                 context.Response.Body = responseBody;
 
                 var headers = JsonConvert.SerializeObject(context.Request.Headers.ToDictionary(header => header.Key, header => header.Value));
+
+                var form = string.Empty;
+                if (context.Request.HasFormContentType)
+                {
+                    var formDict = new Dictionary<string, string>();
+                    foreach (string key in context.Request.Form.Keys.Where(k => !String.IsNullOrEmpty(k)))
+                    {
+                        formDict.Add(key, context.Request.Form[key]);
+                    }
+                    form = JsonConvert.SerializeObject(formDict);
+                }
+
                 //Continue down the Middleware pipeline, eventually returning to this class
                 using (logger.BeginScope(sessionStorage.GetLoggingHeaders()))
                 {
-                    using (logger.BeginScope(new Dictionary<string, object> {{"Headers", headers}, {"Body", body}}))
+                    using (logger.BeginScope(new Dictionary<string, object> {{"Headers", headers}, {"Body", body}, {"Form", form}}))
                     {
                         logger.LogInformation("HTTP {Method} request: {Scheme} {Host} {RequestPath} {QueryString}", context.Request.Method, context.Request.Scheme, context.Request.Host, context.Request.Path, context.Request.QueryString);
                     }
